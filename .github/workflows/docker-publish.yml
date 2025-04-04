@@ -19,7 +19,6 @@ env:
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -92,12 +91,22 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
-      # Trigger workflow in mvc_helm repo
-      - name: Trigger Helm Chart Update Workflow
-        if: github.event_name != 'pull_request'
+      # # Trigger workflow in mvc_helm repo
+      # - name: Trigger Helm Chart Update Workflow
+      #   if: github.event_name != 'pull_request'
+      #   run: |
+      #     curl -X POST -H "Accept: application/vnd.github.v3+json" \
+      #          -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" \
+      #          https://api.github.com/repos/namangajjar26/mvc_helm/actions/workflows/main.yml/dispatches \
+      #          -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.tags }}\"}}"
+  trigger:
+    runs-on: ubuntu-latest
+    steps:
+      - name: helm update 
         run: |
-          curl -X POST -H "Accept: application/vnd.github.v3+json" \
-               -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" \
-               https://api.github.com/repos/namangajjar26/mvc_helm/actions/workflows/main.yml/dispatches \
-               -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.tags }}\"}}"
-
+          curl -L \
+            -X POST \
+            -H "Accept: application/vnd.github+json" \
+            -H "Authorization: Bearer ${{ secrets.PAT }}" \
+            https://api.github.com/repos/namangajjar26/mvc_helm/actions/workflows/main.yml/dispatches \
+            -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.tags }}\"}}"
