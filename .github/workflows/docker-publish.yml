@@ -92,11 +92,6 @@ jobs:
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
 
-
-      - name: Get Image Tag
-        id: get-tag
-        run: echo "IMAGE_TAG=$(echo ${{ github.ref_name }} | sed 's/[^a-zA-Z0-9]/-/g')" >> $GITHUB_ENV
-
       # Trigger workflow in mvc_helm repo
       - name: Trigger Helm Chart Update Workflow
         if: github.event_name != 'pull_request'
@@ -104,5 +99,5 @@ jobs:
           curl -X POST -H "Accept: application/vnd.github.v3+json" \
                -H "Authorization: token ${{ secrets.PAT_TOKEN }}" \
                https://api.github.com/repos/namangajjar26/mvc_helm/actions/workflows/update-helm.yml/dispatches \
-               -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ env.IMAGE_TAG }}\"}}"
+               -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.tags }}\"}}"
 
