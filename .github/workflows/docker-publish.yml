@@ -91,3 +91,16 @@ jobs:
         # This step uses the identity token to provision an ephemeral certificate
         # against the sigstore community Fulcio instance.
         run: echo "${TAGS}" | xargs -I {} cosign sign --yes {}@${DIGEST}
+
+
+      - name: Trigger Helm Chart Update Workflow
+        if: github.event_name != 'pull_request'
+        env:
+          NEW_TAG: ${{ steps.meta.outputs.version }}
+          REPO: "namangajjar26/mvc_helm"
+        run: |
+          curl -X POST -H "Accept: application/vnd.github.v3+json" \
+               -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+               https://api.github.com/repos/$REPO/actions/workflows/update-helm.yml/dispatches \
+               -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"$NEW_TAG\"}}"
+
