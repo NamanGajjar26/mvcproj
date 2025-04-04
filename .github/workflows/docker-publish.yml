@@ -109,6 +109,7 @@ jobs:
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" \
-            https://api.github.com/repos/namangajjar26/mvc_helm/actions/workflows/main.yml/dispatches \
-            -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.version }}\"}}"
+            https://api.github.com/repos/namangajjar26/mvc_helm/dispatches \
+            -d '{"event_type":"dispatch-event"}'
+
 
