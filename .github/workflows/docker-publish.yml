@@ -100,14 +100,15 @@ jobs:
       #          https://api.github.com/repos/namangajjar26/mvc_helm/actions/workflows/main.yml/dispatches \
       #          -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.tags }}\"}}"
   trigger:
-    needs: build   # <-- Ensures this runs after 'build' job completes
+    needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: helm update 
+      - name: Trigger Helm Chart Update Workflow
         run: |
           curl -L \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer ${{ secrets.PAT_TOKEN }}" \
             https://api.github.com/repos/namangajjar26/mvc_helm/actions/workflows/main.yml/dispatches \
-            -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.tags }}\"}}"
+            -d "{\"ref\":\"main\", \"inputs\": {\"new_tag\": \"${{ steps.meta.outputs.version }}\"}}"
+
